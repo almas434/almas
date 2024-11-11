@@ -1,0 +1,50 @@
+from Crypto.Cipher import DES, AES
+from Crypto.Util.Padding import pad, unpad
+import os
+
+# Функция для шифрования DES
+def des_encrypt(key, plaintext):
+    des = DES.new(key, DES.MODE_ECB)
+    padded_text = pad(plaintext.encode(), DES.block_size)
+    encrypted_text = des.encrypt(padded_text)
+    return encrypted_text
+
+# Функция для шифрования AES
+def aes_encrypt(key, plaintext):
+    aes = AES.new(key, AES.MODE_ECB)
+    padded_text = pad(plaintext, AES.block_size)
+    encrypted_text = aes.encrypt(padded_text)
+    return encrypted_text
+
+# Функция для расшифровки AES
+def aes_decrypt(key, ciphertext):
+    aes = AES.new(key, AES.MODE_ECB)
+    decrypted_text = aes.decrypt(ciphertext)
+    return unpad(decrypted_text, AES.block_size)
+
+# Функция для расшифровки DES
+def des_decrypt(key, ciphertext):
+    des = DES.new(key, DES.MODE_ECB)
+    decrypted_text = des.decrypt(ciphertext)
+    return unpad(decrypted_text, DES.block_size).decode()
+
+# Пример использования
+des_key = b'almas123'  # Ключ DES должен быть ровно 8 байт
+aes_key = os.urandom(16)  # Генерируем 16-байтный ключ для AES (128 бит)
+plaintext = "almas kalaysin"
+
+# Шифрование DES
+des_encrypted_text = des_encrypt(des_key, plaintext)
+print("Зашифрованный текст DES:", des_encrypted_text)
+
+# Шифрование AES поверх DES
+aes_encrypted_text = aes_encrypt(aes_key, des_encrypted_text)
+print("Зашифрованный текст AES поверх DES:", aes_encrypted_text)
+
+# Расшифровка AES
+aes_decrypted_text = aes_decrypt(aes_key, aes_encrypted_text)
+print("Расшифрованный текст после AES:", aes_decrypted_text)
+
+# Расшифровка DES
+des_decrypted_text = des_decrypt(des_key, aes_decrypted_text)
+print("Исходный текст после двойного расшифрования:", des_decrypted_text)
